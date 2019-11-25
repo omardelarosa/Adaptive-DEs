@@ -6,7 +6,8 @@ build: clean dist
 	cc -o dist/devo $(targets) main.c
 
 build-lib: build
-	cc -fPIC -shared -o dist/devolib.so $(targets) main.c
+	# build DE dll
+	cc -fPIC -shared -o dist/DE.so common.c DE.c
 
 clean:
 	rm -rf dist

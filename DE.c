@@ -1,8 +1,10 @@
 // DE.c
 #include "common.h"
+#include <stdio.h>
 #include "DE.h"
 
 static DE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound);
+static DE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initialized_population, double*fitness_values);
 static DE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound);
 static void terminate_population(DE_individual * const population, const int population_size);
 static void terminate_individual(const DE_individual individual);
@@ -41,6 +43,59 @@ double run_DE(const int max_function_evaluations, const int population_size, con
   return best_fitness;
 }
 
+double run_DE_with_population_provided(
+    const int max_function_evaluations, const int population_size,
+    const double scaling_factor, const double crossover_rate,
+    const double (*objective_function)(const double *const, const int),
+    const int problem_size, const double lower_bound, const double upper_bound,
+    double *initial_population, double *fitness_values, double *population_results, double *fitness_results) {
+  // initialization phase
+  DE_individual *population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
+  // return 1.0;
+  int function_evaluation = 0;
+  for (int i = 0; i < population_size; ++i) {
+    population[i].fitness = objective_function(population[i].x, problem_size);
+    ++function_evaluation;
+  }
+  // iteration phase
+  while (max_function_evaluations > function_evaluation) {
+    DE_individual * const candidates = run_recombination(population, population_size, scaling_factor, crossover_rate, problem_size, lower_bound, upper_bound);
+    for (int i = 0; i < population_size; ++i) {
+      candidates[i].fitness = objective_function(candidates[i].x, problem_size);
+      ++function_evaluation;
+    }
+
+    DE_individual * const next_population = run_selection(population, candidates, population_size, problem_size);
+    terminate_population(population, population_size);
+    terminate_population(candidates, population_size);
+    population = next_population;
+  }
+
+  const double best_fitness = population[get_best_index(population, population_size)].fitness;
+
+  // Extract fitness values and final population
+  if (population_results != NULL && fitness_results != NULL) {
+    double *population_matrix_results[population_size];
+    double fitness_values_results[population_size];
+    for (int i = 0; i < population_size; i++)
+          population_matrix_results[i] = (double *)malloc(problem_size * sizeof(double));
+
+    for (int i = 0; i < population_size; i++) {
+      for (int j = 0; j < problem_size; j++) {
+        population_matrix_results[i][j] = population[i].x[j];
+      }
+      fitness_values_results[i] = population[i].fitness;
+    }
+
+    population_results = &population_matrix_results[0][0];
+    fitness_results = (double *)&fitness_values_results;
+  }
+
+
+  terminate_population(population, population_size);
+  return best_fitness;
+}
+
 static DE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound) {
   DE_individual * const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
   for (int i = 0; i < population_size; ++i) {
@@ -48,6 +103,23 @@ static DE_individual *get_initialized_population(const int population_size, cons
   }
   return population;
 }
+
+static DE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initial_population, double *fitness_values) {
+  // Creating population array pointer
+  DE_individual * const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i) {
+    static DE_individual individual;
+    individual.x = (double *)malloc(problem_size * sizeof(double));
+    // Transfer values from 2D array to population array
+    for (int j = 0; j < problem_size; j++) {
+      individual.x[j] = *(initial_population + i * problem_size + j);
+    }
+    individual.fitness = (double)fitness_values[i];
+    population[i] = individual;
+  }
+  return population;
+}
+
 
 static DE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound) {
   DE_individual individual;
