@@ -12,14 +12,20 @@
 // objective function
 const double sphere_function(const double * const vector, const int dimension);
 
-int main(void) {
-	srand(time(NULL));
+void run_all(unsigned int seed) {
+	srand(seed);
+	printf("Seed: %d", seed);
+
 	printf("DE: %E\n", run_DE(150000, 100, 0.5, 0.9, sphere_function, 30, -100.0, 100.0));
 	printf("jDE: %E\n", run_jDE(150000, 100, sphere_function, 30, -100.0, 100.0));
 	printf("CoDE: %E\n", run_CoDE(150000, 100, sphere_function, 30, -100.0, 100.0));
 	printf("JADE: %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0));
 	printf("SHADE: %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0));
 	printf("LSHADE: %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0));
+}
+
+int main(void) {
+	run_all(time(NULL));
 	return 0;
 }
 
