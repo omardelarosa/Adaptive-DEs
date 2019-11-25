@@ -1,5 +1,5 @@
 import ctypes as c
-import DE as DE
+import DE
 import numpy as np
 
 
@@ -22,7 +22,7 @@ def run_all():
         100.0
     )
 
-    print(result_01)
+    print("DE: ", result_01)
 
     init_population = np.random.rand(100, 30)
     init_fitnesses = np.random.rand(100, 1)
@@ -44,11 +44,12 @@ def run_all():
         out_fitnesses.ctypes.data_as(c.POINTER(c.c_double))
     )
 
+    print("DE (with provided population)")
     print("Initial Population & Fitness")
     print(init_population)
     print(init_fitnesses)
 
-    print("Ouput Population & Fitness")
+    print("Output Population & Fitness")
     print(out_population)
     print(out_fitnesses)
 

@@ -2,16 +2,18 @@
 
 Adaptive Differential Evolution tools.
 
-## Build
+## Build C Libraries
 
 ```
-$ make build
+$ make build build-lib
 ```
 
 ## Usage
 
-After building, run `des_bin` executable
+After building, run `dist/devo` executable
 
 ```
-./bin/des
+./dist/devo
 ```
+
+## Python Usage
