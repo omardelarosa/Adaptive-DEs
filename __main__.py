@@ -1,7 +1,6 @@
 import ctypes as c
-import time as time
-
-OBJFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double), c.c_int)
+import DE as DE
+import numpy as np
 
 
 def sphere_function(vec, dimension):
@@ -11,47 +10,47 @@ def sphere_function(vec, dimension):
     return c.c_double(result)
 
 
-c_sphere_func_func = OBJFUNC(sphere_function)
-
-DE = c.CDLL("dist/DE.so")
-# DE.run_DE_with_population_provided.argtypes = (
-#     c.c_int,  # max_function_evaluations
-#     c.c_int,  # population_size
-#     c.c_double,  # scaling_factor
-#     c.c_double,  # crossover_rate
-#     OBJFUNC,  # objective_function
-#     c.c_int,  # problem_size
-#     c.c_double,  # lower_bound
-#     c.c_double,  # upper_bound
-#     c.POINTER(c.POINTER)  # initial_population
-# )
-
-DE.run_DE.argtypes = (
-    c.c_int,  # max_function_evaluations
-    c.c_int,  # population_size
-    c.c_double,  # scaling_factor
-    c.c_double,  # crossover_rate
-    OBJFUNC,  # objective_function
-    c.c_int,  # problem_size
-    c.c_double,  # lower_bound
-    c.c_double  # upper_bound
-)
-
-
-def run_all(seed):
-    global _devo
-    s = c.c_uint(seed)
-    result = DE.run_DE(
-        c.c_int(150000),
-        c.c_int(100),
-        c.c_double(0.5),
-        c.c_double(0.9),
-        c_sphere_func_func,
-        c.c_int(30),
-        c.c_double(-100.0),
-        c.c_double(100.0)
+def run_all():
+    result_01 = DE.run_DE(
+        150000,
+        100,
+        0.5,
+        0.9,
+        sphere_function,
+        30,
+        -100.0,
+        100.0
     )
-    return result
+
+    print(result_01)
+
+    init_population = np.random.rand(100, 30)
+    init_fitnesses = np.random.rand(100, 1)
+    out_population = np.zeros((100, 30))
+    out_fitnesses = np.zeros((100, 1))
+
+    result_02 = DE.run_DE_with_population_provided(
+        150000,
+        100,
+        0.5,
+        0.9,
+        sphere_function,
+        30,
+        -100.0,
+        100.0,
+        init_population.ctypes.data_as(c.POINTER(c.c_double)),
+        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
+        out_population.ctypes.data_as(c.POINTER(c.c_double)),
+        out_fitnesses.ctypes.data_as(c.POINTER(c.c_double))
+    )
+
+    print("Initial Population & Fitness")
+    print(init_population)
+    print(init_fitnesses)
+
+    print("Ouput Population & Fitness")
+    print(out_population)
+    print(out_fitnesses)
 
 
-print(run_all(1574708500))
+run_all()
