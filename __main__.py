@@ -37,7 +37,6 @@ def run_all():
             row = int(i / problem_size)
             col = i % problem_size
             out_population[row][col] = population[i]
-        return
 
         # Store fitness values
         for j in range(0, population_size):

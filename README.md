@@ -58,7 +58,6 @@ def results_callback(population, fitness_values, population_size, problem_size):
         row = int(i / problem_size)
         col = i % problem_size
         out_population[row][col] = population[i]
-    return
 
     # Store fitness values
     for j in range(0, population_size):
