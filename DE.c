@@ -48,7 +48,7 @@ double run_DE_with_population_provided(
     const double scaling_factor, const double crossover_rate,
     const double (*objective_function)(const double *const, const int),
     const int problem_size, const double lower_bound, const double upper_bound,
-    double *initial_population, double *fitness_values, double *population_results, double *fitness_results) {
+    double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
   // initialization phase
   DE_individual *population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
   // return 1.0;
@@ -64,7 +64,6 @@ double run_DE_with_population_provided(
       candidates[i].fitness = objective_function(candidates[i].x, problem_size);
       ++function_evaluation;
     }
-
     DE_individual * const next_population = run_selection(population, candidates, population_size, problem_size);
     terminate_population(population, population_size);
     terminate_population(candidates, population_size);
@@ -74,7 +73,7 @@ double run_DE_with_population_provided(
   const double best_fitness = population[get_best_index(population, population_size)].fitness;
 
   // Extract fitness values and final population
-  if (population_results != NULL && fitness_results != NULL) {
+  if (results_callback != NULL) {
     double *population_matrix_results[population_size];
     double fitness_values_results[population_size];
     for (int i = 0; i < population_size; i++)
@@ -86,9 +85,7 @@ double run_DE_with_population_provided(
       }
       fitness_values_results[i] = population[i].fitness;
     }
-
-    population_results = &population_matrix_results[0][0];
-    fitness_results = (double *)&fitness_values_results;
+    results_callback(&population_matrix_results[0][0], (double*)&fitness_values_results, population_size, problem_size);
   }
 
 

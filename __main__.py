@@ -26,8 +26,23 @@ def run_all():
 
     init_population = np.random.rand(100, 30)
     init_fitnesses = np.random.rand(100, 1)
-    out_population = np.zeros((100, 30))
-    out_fitnesses = np.zeros((100, 1))
+    out_population = np.zeros((100, 30), dtype='float32')
+    out_fitnesses = np.zeros((100, 1), dtype='float32')
+
+    def results_callback(population, fitness_values, population_size, problem_size):
+        # Store results to python memory containers
+
+        # Store population
+        for i in range(0, population_size * problem_size):
+            row = int(i / problem_size)
+            col = i % problem_size
+            out_population[row][col] = population[i]
+        return
+
+        # Store fitness values
+        for j in range(0, population_size):
+            out_fitnesses = fitness_values[j]
+        return
 
     result_02 = DE.run_DE_with_population_provided(
         150000,
@@ -40,16 +55,14 @@ def run_all():
         100.0,
         init_population.ctypes.data_as(c.POINTER(c.c_double)),
         init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
-        out_population.ctypes.data_as(c.POINTER(c.c_double)),
-        out_fitnesses.ctypes.data_as(c.POINTER(c.c_double))
+        results_callback
     )
 
     print("DE (with provided population)")
     print("Initial Population & Fitness")
     print(init_population)
     print(init_fitnesses)
-
-    print("Output Population & Fitness")
+    print("Output")
     print(out_population)
     print(out_fitnesses)
 

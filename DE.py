@@ -21,7 +21,12 @@ import time as time
 _DE = c.cdll.LoadLibrary("dist/DE.so")
 
 
+# Objective function
 OBJFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double), c.c_int)
+
+# Type annotation for result function
+RESULTFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double),
+                         c.POINTER(c.c_double), c.c_int, c.c_int)
 
 
 _DE.run_DE_with_population_provided.argtypes = (
@@ -35,8 +40,7 @@ _DE.run_DE_with_population_provided.argtypes = (
     c.c_double,  # upper_bound
     c.POINTER(c.c_double),  # initial_population
     c.POINTER(c.c_double),  # fitness_values
-    c.POINTER(c.c_double),  # population_results
-    c.POINTER(c.c_double)  # fitness value results
+    RESULTFUNC  # a callback to handle results
 )
 
 _DE.run_DE.argtypes = (
@@ -65,7 +69,7 @@ def run_DE(max_function_evaluations, population_size, scaling_factor, crossover_
     return result
 
 
-def run_DE_with_population_provided(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, out_population, out_fitnesses):
+def run_DE_with_population_provided(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
     result = _DE.run_DE_with_population_provided(
         c.c_int(max_function_evaluations),
         c.c_int(population_size),
@@ -77,8 +81,7 @@ def run_DE_with_population_provided(max_function_evaluations, population_size, s
         upper_bound,
         init_population,
         init_fitnesses,
-        out_population,
-        out_fitnesses
+        RESULTFUNC(result_callback)
     )
     return result
 

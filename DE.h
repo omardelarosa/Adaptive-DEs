@@ -19,6 +19,9 @@ double run_DE_with_population_provided(
     const double (*objective_function)(const double *const, const int),
     const int problem_size, const double lower_bound, const double upper_bound,
     double *initial_population, double *fitness_values,
-    double *population_results, double *fitness_results);
+    void (*results_callback)(const double *population_results,
+                             const double *fitness_results,
+                             const int population_size,
+                             const int problem_size));
 
 #endif

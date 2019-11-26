@@ -13,6 +13,7 @@
 const double sphere_function(const double * const vector, const int dimension);
 double *create_initial_population(int population_size, int problem_size);
 double *create_initial_fitness_values(int population_size);
+void do_something_with_results(const double * population_matrix, const double * fitness_values, const int population_size, const int problem_size);
 
 void run_all(unsigned int seed) {
 	srand(seed);
@@ -25,7 +26,7 @@ void run_all(unsigned int seed) {
 
 	double *population = create_initial_population(population_size, problem_size);
 	double *fitness_values = create_initial_fitness_values(population_size);
-	printf("DE(with provided pop): %E\n", run_DE_with_population_provided(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, NULL, NULL));
+	printf("DE(with provided pop): %E\n", run_DE_with_population_provided(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
 
 	printf("jDE: %E\n", run_jDE(150000, 100, sphere_function, 30, -100.0, 100.0));
 	printf("CoDE: %E\n", run_CoDE(150000, 100, sphere_function, 30, -100.0, 100.0));
@@ -63,9 +64,13 @@ double *create_initial_population(int population_size, int problem_size) {
 
 double *create_initial_fitness_values(int population_size) {
 	int m = population_size;
-	double arr[m];
+	double *arr;
 	for (int i = 0; i < population_size; i++) {
 		arr[i] = (double)rand()/RAND_MAX*200.0-100.0;
 	}
-	return &arr;
+	return arr;
+}
+
+void do_something_with_results(const double * population_matrix, const double * fitness_values, const int population_size, const int problem_size) {
+	printf("ran DE callback successfully: %d, %d\n", population_size, problem_size);
 }
