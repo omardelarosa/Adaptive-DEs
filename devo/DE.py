@@ -1,24 +1,25 @@
 import ctypes as c
 import time as time
-# import os
-# import glob
+import os
+import glob
 
-# Module directory
-# _MODULE_PATH = os.path.dirname(__file__)
+_MODULE_PATH = os.path.dirname(__file__)
+
+# Module build directory
+_BUILD_PATH = "build"
 
 # # DLL path
-# _SO_PATH = 'DE*.so'
+_DE_SO_PATH = 'DE.*.so'
 # # the absolute path to the C shared object library
-# _LIB_PATH = os.path.join(_MODULE_PATH, _SO_PATH)
+_LIB_PATH = os.path.join(_MODULE_PATH, "..",
+                         _BUILD_PATH, "**", _DE_SO_PATH)
 
-# _DE = None
+_DE = None
 
-# try:
-#     _DE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
-# except IndexError:
-#     raise OSError('missing static DE*.so library!')
-
-_DE = c.cdll.LoadLibrary("dist/DE.so")
+try:
+    _DE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
+except IndexError:
+    raise OSError('missing static DE*.so library!')
 
 
 # Objective function
@@ -84,6 +85,3 @@ def run_DE_with_population_provided(max_function_evaluations, population_size, s
         RESULTFUNC(result_callback)
     )
     return result
-
-
-__all__ = []

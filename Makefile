@@ -2,13 +2,13 @@ targets = common.c CoDE.c DE.c JADE.c LSHADE.c SHADE.c jDE.c
 
 build-lib: build
 	# build DE dll
-	cc -fPIC -shared -o dist/DE.so common.c DE.c
+	cc -fPIC -shared -o build/DE.so common.c DE.c
 
-build: clean dist
-	cc -o dist/devo $(targets) main.c
+build: clean prepare
+	cc -o build/devo $(targets) main.c
 
-dist:
-	./bin/dist.sh
+prepare:
+	./bin/prepare.sh
 
 clean:
-	rm -rf dist
+	rm -rf build

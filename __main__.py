@@ -1,5 +1,5 @@
 import ctypes as c
-import DE
+import devo.DE
 import numpy as np
 
 
@@ -11,7 +11,7 @@ def sphere_function(vec, dimension):
 
 
 def run_all():
-    result_01 = DE.run_DE(
+    result_01 = devo.DE.run_DE(
         150000,
         100,
         0.5,
@@ -44,7 +44,7 @@ def run_all():
             out_fitnesses = fitness_values[j]
         return
 
-    result_02 = DE.run_DE_with_population_provided(
+    result_02 = devo.DE.run_DE_with_population_provided(
         150000,
         100,
         0.5,
