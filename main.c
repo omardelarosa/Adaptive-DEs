@@ -62,13 +62,13 @@ double *create_initial_population(int population_size, int problem_size) {
 	return &arr[0][0];
 }
 
-double *create_initial_fitness_values(int population_size) {
+double * create_initial_fitness_values(int population_size) {
 	int m = population_size;
-	double *arr;
+	double arr[m];
 	for (int i = 0; i < population_size; i++) {
 		arr[i] = (double)rand()/RAND_MAX*200.0-100.0;
 	}
-	return arr;
+	return (double *)&arr;
 }
 
 void do_something_with_results(const double * population_matrix, const double * fitness_values, const int population_size, const int problem_size) {
