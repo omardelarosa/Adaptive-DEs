@@ -6,7 +6,7 @@ import numpy as np
 def sphere_function(vec, dimension):
     result = 0.0
     for i in range(0, dimension):
-        result = vec[i] * vec[i]
+        result += (vec[i] * vec[i])
     return c.c_double(result)
 
 
@@ -59,11 +59,14 @@ def run_all():
 
     print("DE (with provided population)")
     print("Initial Population & Fitness")
-    print(init_population)
-    print(init_fitnesses)
-    print("Output")
-    print(out_population)
-    print(out_fitnesses)
+
+    print("Resulting Population", out_population)
+    print("Resulting Fitnesses", out_fitnesses)
+    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
+    print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
+    print("MinIndividual: ", out_population[min_fit_idx])
+    print("TestObjectiveFunction:", sphere_function(
+        out_population[min_fit_idx], 30))
 
 
 run_all()
