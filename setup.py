@@ -13,6 +13,9 @@ C_MODULE_FILE_NAMES = [
     ('DE', 'DE.c'),
     ('LSHADE', 'LSHADE.c'),
     ('SHADE', 'SHADE.c'),
+    ('jDE', 'jDE.c'),
+    ('JADE', 'JADE.c'),
+    ('CoDE', 'CoDE.c'),
 ]
 
 MODULES = []

@@ -12,7 +12,6 @@ static void terminate_population(jDE_individual * const population, const int po
 static void terminate_individual(const jDE_individual individual);
 static jDE_individual *get_copied_population(const jDE_individual * const source_population, const int population_size, const int problem_size);
 static jDE_individual get_copied_individual(const jDE_individual source_individual, const int problem_size);
-static jDE_individual *get_sorted_population(const jDE_individual * const population, const int population_size, const int problem_size);
 static jDE_individual *run_recombination(const jDE_individual * const population, const int population_size,
 					 const int problem_size, const double lower_bound, const double upper_bound);
 static jDE_parameter_control_results parameter_control(const double scaling_factor, const double crossover_rate);
@@ -134,19 +133,6 @@ static jDE_individual get_copied_individual(const jDE_individual source_individu
   individual.scaling_factor = source_individual.scaling_factor;
   individual.crossover_rate = source_individual.crossover_rate;
   return individual;
-}
-
-static jDE_individual *get_sorted_population(const jDE_individual * const population, const int population_size, const int problem_size) {
-  jDE_individual * const sorted_population = get_copied_population(population, population_size, problem_size);
-  for (int i = 0; i < population_size - 1; ++i) {
-    int best_index = get_best_index(sorted_population + i, population_size - i) + i;
-    if (best_index != i) {
-      jDE_individual t_individual = sorted_population[i];
-      sorted_population[i] = sorted_population[best_index];
-      sorted_population[best_index] = t_individual;
-    }
-  }
-  return sorted_population;
 }
 
 static jDE_individual *run_recombination(const jDE_individual * const population, const int population_size,

@@ -12,7 +12,6 @@ static void terminate_population(CoDE_individual * const population, const int p
 static void terminate_individual(const CoDE_individual individual);
 static CoDE_individual *get_copied_population(const CoDE_individual * const source_population, const int population_size, const int problem_size);
 static CoDE_individual get_copied_individual(const CoDE_individual source_individual, const int problem_size);
-static CoDE_individual *get_sorted_population(const CoDE_individual * const population, const int population_size, const int problem_size);
 static CoDE_individual *run_recombination(const CoDE_individual * const population, const int population_size,
 					  const double(*objective_function)(const double * const, const int),
 					  const int problem_size, const double lower_bound, const double upper_bound);
@@ -125,19 +124,6 @@ static CoDE_individual get_copied_individual(const CoDE_individual source_indivi
   memcpy(individual.x, source_individual.x, sizeof(double) * problem_size);
   individual.fitness = source_individual.fitness;
   return individual;
-}
-
-static CoDE_individual *get_sorted_population(const CoDE_individual * const population, const int population_size, const int problem_size) {
-  CoDE_individual * const sorted_population = get_copied_population(population, population_size, problem_size);
-  for (int i = 0; i < population_size - 1; ++i) {
-    int best_index = get_best_index(sorted_population + i, population_size - i) + i;
-    if (best_index != i) {
-      CoDE_individual t_individual = sorted_population[i];
-      sorted_population[i] = sorted_population[best_index];
-      sorted_population[best_index] = t_individual;
-    }
-  }
-  return sorted_population;
 }
 
 static CoDE_individual *run_recombination(const CoDE_individual * const population, const int population_size,

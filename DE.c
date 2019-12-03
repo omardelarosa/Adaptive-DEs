@@ -10,7 +10,6 @@ static void terminate_population(DE_individual * const population, const int pop
 static void terminate_individual(const DE_individual individual);
 static DE_individual *get_copied_population(const DE_individual * const source_population, const int population_size, const int problem_size);
 static DE_individual get_copied_individual(const DE_individual source_individual, const int problem_size);
-static DE_individual *get_sorted_population(const DE_individual * const population, const int population_size, const int problem_size);
 static DE_individual *run_recombination(const DE_individual * const population, const int population_size, const double scaling_factor, const double crossover_rate,
 					const int problem_size, const double lower_bound, const double upper_bound);
 static DE_individual *run_selection(const DE_individual * const population, const DE_individual * const candidates, const int population_size, const int problem_size);
@@ -127,19 +126,6 @@ static DE_individual get_copied_individual(const DE_individual source_individual
   memcpy(individual.x, source_individual.x, sizeof(double) * problem_size);
   individual.fitness = source_individual.fitness;
   return individual;
-}
-
-static DE_individual *get_sorted_population(const DE_individual * const population, const int population_size, const int problem_size) {
-  DE_individual * const sorted_population = get_copied_population(population, population_size, problem_size);
-  for (int i = 0; i < population_size - 1; ++i) {
-    int best_index = get_best_index(sorted_population + i, population_size - i) + i;
-    if (best_index != i) {
-      DE_individual t_individual = sorted_population[i];
-      sorted_population[i] = sorted_population[best_index];
-      sorted_population[best_index] = t_individual;
-    }
-  }
-  return sorted_population;
 }
 
 static DE_individual *run_recombination(const DE_individual * const population, const int population_size, const double scaling_factor, const double crossover_rate,
