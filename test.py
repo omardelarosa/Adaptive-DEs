@@ -48,9 +48,9 @@ def results_callback(population, fitness_values, population_size, problem_size):
     return
 
 
-def test_DE():
+def test(name, module):
     reset()
-    result_01 = devo.DE.run(
+    result_01 = module.run(
         150000,
         100,
         0.5,
@@ -64,9 +64,9 @@ def test_DE():
         NULL_CALLBACK
     )
 
-    print("DE: ", result_01)
+    print((name + ": "), result_01)
 
-    result_02 = devo.DE.run(
+    result_02 = module.run(
         150000,
         100,
         0.5,
@@ -80,7 +80,7 @@ def test_DE():
         results_callback
     )
 
-    print("DE (with provided population)")
+    print(name + " (with provided population)")
     print("Initial Population & Fitness")
 
     min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
@@ -94,9 +94,11 @@ def test_DE():
     print("MinIndividual: ", out_population[min_fit_idx])
 
 
+# NOTE: This function has a different call signature
 def test_LSHADE():
+    module = devo.LSHADE
     reset()
-    result_01 = devo.LSHADE.run(
+    result_01 = module.run(
         150000,
         sphere_function,
         30,
@@ -109,7 +111,7 @@ def test_LSHADE():
 
     print("LSHADE: ", result_01)
 
-    result_02 = devo.LSHADE.run(
+    result_02 = module.run(
         150000,
         sphere_function,
         30,
@@ -134,197 +136,14 @@ def test_LSHADE():
     print("MinIndividual: ", out_population[min_fit_idx])
 
 
-def test_SHADE():
-    reset()
-    result_01 = devo.SHADE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        None,
-        None,
-        NULL_CALLBACK
-    )
-
-    print("SHADE: ", result_01)
-
-    result_02 = devo.SHADE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        init_population.ctypes.data_as(c.POINTER(c.c_double)),
-        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
-        results_callback
-    )
-
-    print("SHADE (with provided population)")
-    print("Initial Population & Fitness")
-
-    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
-
-    if VERBOSE_LOGGING:
-        print("Resulting Population", out_population)
-        print("Resulting Fitnesses", out_fitnesses)
-    print("TestObjectiveFunction:", sphere_function(
-        out_population[min_fit_idx], 30).value)
-    print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
-    print("MinIndividual: ", out_population[min_fit_idx])
-
-
-def test_jDE():
-    reset()
-    result_01 = devo.jDE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        None,
-        None,
-        NULL_CALLBACK
-    )
-
-    print("jDE: ", result_01)
-
-    result_02 = devo.jDE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        init_population.ctypes.data_as(c.POINTER(c.c_double)),
-        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
-        results_callback
-    )
-
-    print("jDE (with provided population)")
-    print("Initial Population & Fitness")
-
-    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
-
-    if VERBOSE_LOGGING:
-        print("Resulting Population", out_population)
-        print("Resulting Fitnesses", out_fitnesses)
-    print("TestObjectiveFunction:", sphere_function(
-        out_population[min_fit_idx], 30).value)
-    print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
-    print("MinIndividual: ", out_population[min_fit_idx])
-
-
-def test_JADE():
-    reset()
-    result_01 = devo.JADE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        None,
-        None,
-        NULL_CALLBACK
-    )
-
-    print("JADE: ", result_01)
-
-    result_02 = devo.jDE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        init_population.ctypes.data_as(c.POINTER(c.c_double)),
-        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
-        results_callback
-    )
-
-    print("JADE (with provided population)")
-    print("Initial Population & Fitness")
-
-    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
-
-    if VERBOSE_LOGGING:
-        print("Resulting Population", out_population)
-        print("Resulting Fitnesses", out_fitnesses)
-    print("TestObjectiveFunction:", sphere_function(
-        out_population[min_fit_idx], 30).value)
-    print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
-    print("MinIndividual: ", out_population[min_fit_idx])
-
-
-def test_CoDE():
-    reset()
-    result_01 = devo.JADE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        None,
-        None,
-        NULL_CALLBACK
-    )
-
-    print("CoDE: ", result_01)
-
-    result_02 = devo.CoDE.run(
-        150000,
-        100,
-        0.5,
-        0.9,
-        sphere_function,
-        30,
-        -100.0,
-        100.0,
-        init_population.ctypes.data_as(c.POINTER(c.c_double)),
-        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
-        results_callback
-    )
-
-    print("CoDE (with provided population)")
-    print("Initial Population & Fitness")
-
-    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
-
-    if VERBOSE_LOGGING:
-        print("Resulting Population", out_population)
-        print("Resulting Fitnesses", out_fitnesses)
-    print("TestObjectiveFunction:", sphere_function(
-        out_population[min_fit_idx], 30).value)
-    print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
-    print("MinIndividual: ", out_population[min_fit_idx])
-
-
 def run_all():
-    test_DE()
+    test("DE", devo.DE)
+    # test("LSHADE", devo.LSHADE)
     test_LSHADE()
-    test_SHADE()
-    test_jDE()
-    test_JADE()
-    test_CoDE()
+    test("SHADE", devo.SHADE)
+    test("jDE", devo.jDE)
+    test("JADE", devo.JADE)
+    test("CoDE", devo.CoDE)
 
 
 run_all()
