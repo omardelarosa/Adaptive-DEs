@@ -1,6 +1,7 @@
 import ctypes as c
 import devo.DE
 import devo.LSHADE
+import devo.SHADE
 import numpy as np
 
 VERBOSE_LOGGING = False
@@ -93,9 +94,6 @@ def test_LSHADE():
     reset()
     result_01 = devo.LSHADE.run(
         150000,
-        100,
-        0.5,
-        0.9,
         sphere_function,
         30,
         -100.0,
@@ -109,9 +107,6 @@ def test_LSHADE():
 
     result_02 = devo.LSHADE.run(
         150000,
-        100,
-        0.5,
-        0.9,
         sphere_function,
         30,
         -100.0,
@@ -135,9 +130,56 @@ def test_LSHADE():
     print("MinIndividual: ", out_population[min_fit_idx])
 
 
+def test_SHADE():
+    reset()
+    result_01 = devo.SHADE.run(
+        150000,
+        100,
+        0.5,
+        0.9,
+        sphere_function,
+        30,
+        -100.0,
+        100.0,
+        None,
+        None,
+        NULL_CALLBACK
+    )
+
+    print("SHADE: ", result_01)
+
+    result_02 = devo.SHADE.run(
+        150000,
+        100,
+        0.5,
+        0.9,
+        sphere_function,
+        30,
+        -100.0,
+        100.0,
+        init_population.ctypes.data_as(c.POINTER(c.c_double)),
+        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
+        results_callback
+    )
+
+    print("SHADE (with provided population)")
+    print("Initial Population & Fitness")
+
+    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
+
+    if VERBOSE_LOGGING:
+        print("Resulting Population", out_population)
+        print("Resulting Fitnesses", out_fitnesses)
+    print("TestObjectiveFunction:", sphere_function(
+        out_population[min_fit_idx], 30).value)
+    print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
+    print("MinIndividual: ", out_population[min_fit_idx])
+
+
 def run_all():
     test_DE()
     test_LSHADE()
+    test_SHADE()
 
 
 run_all()

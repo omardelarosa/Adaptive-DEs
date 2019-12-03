@@ -11,7 +11,8 @@ with open('README.md') as README_file:
 # Index of all supported C modules
 C_MODULE_FILE_NAMES = [
     ('DE', 'DE.c'),
-    ('LSHADE', 'LSHADE.c')
+    ('LSHADE', 'LSHADE.c'),
+    ('SHADE', 'SHADE.c'),
 ]
 
 MODULES = []

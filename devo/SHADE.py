@@ -9,17 +9,17 @@ _MODULE_PATH = os.path.dirname(__file__)
 _BUILD_PATH = "build"
 
 # # DLL path
-_DE_SO_PATH = 'DE.*.so'
+_SHADE_SO_PATH = 'SHADE.*.so'
 # # the absolute path to the C shared object library
 _LIB_PATH = os.path.join(_MODULE_PATH, "..",
-                         _BUILD_PATH, "**", _DE_SO_PATH)
+                         _BUILD_PATH, "**", _SHADE_SO_PATH)
 
-_DE = None
+_SHADE = None
 
 try:
-    _DE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
+    _SHADE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
 except IndexError:
-    raise OSError('missing static DE*.so library!')
+    raise OSError('missing static SHADE*.so library!')
 
 
 # Objective function
@@ -29,7 +29,7 @@ OBJFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double), c.c_int)
 RESULTFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double),
                          c.POINTER(c.c_double), c.c_int, c.c_int)
 
-_DE.run_DE.argtypes = (
+_SHADE.run_SHADE.argtypes = (
     c.c_int,  # max_function_evaluations
     c.c_int,  # population_size
     c.c_double,  # scaling_factor
@@ -44,8 +44,8 @@ _DE.run_DE.argtypes = (
 )
 
 
-def run_DE(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
-    result = _DE.run_DE(
+def run(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
+    result = _SHADE.run_SHADE(
         c.c_int(max_function_evaluations),
         c.c_int(population_size),
         c.c_double(scaling_factor),
