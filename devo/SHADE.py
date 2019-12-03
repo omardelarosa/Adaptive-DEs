@@ -43,6 +43,8 @@ _SHADE.run_SHADE.argtypes = (
     RESULTFUNC  # a callback to handle results
 )
 
+_SHADE.run_SHADE.restype = c.c_double
+
 
 def run(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
     result = _SHADE.run_SHADE(

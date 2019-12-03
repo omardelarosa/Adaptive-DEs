@@ -43,6 +43,8 @@ _jDE.run_jDE.argtypes = (
     RESULTFUNC  # a callback to handle results
 )
 
+_jDE.run_jDE.restype = c.c_double
+
 
 def run(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
     result = _jDE.run_jDE(

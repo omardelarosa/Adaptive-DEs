@@ -36,6 +36,7 @@ double run_LSHADE(const int max_function_evaluations,
   const int min_population_size = 4;
   int population_size = max_population_size;
   LSHADE_individual *population;
+
   if (initial_population != NULL && fitness_values != NULL) {
     population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
   } else {

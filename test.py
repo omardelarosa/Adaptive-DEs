@@ -9,19 +9,14 @@ import numpy as np
 
 VERBOSE_LOGGING = False
 
-init_population = np.random.rand(100, 30)
-init_fitnesses = np.random.rand(100, 1)
-out_population = np.zeros((100, 30), dtype='float32')
-out_fitnesses = np.zeros((100, 1), dtype='float32')
-
 
 def NULL_CALLBACK(x, y, z, w):
     return None
 
 
 def reset():
-    init_population = np.random.rand(100, 30)
-    init_fitnesses = np.random.rand(100, 1)
+    # init_population = np.random.rand(100, 30)
+    # init_fitnesses = np.random.rand(100, 1)
     out_population = np.zeros((100, 30), dtype='float32')
     out_fitnesses = np.zeros((100, 1), dtype='float32')
 
@@ -33,23 +28,26 @@ def sphere_function(vec, dimension):
     return c.c_double(result)
 
 
-def results_callback(population, fitness_values, population_size, problem_size):
-    # Store results to python memory containers
-
-    # Store population
-    for i in range(0, population_size * problem_size):
-        row = int(i / problem_size)
-        col = i % problem_size
-        out_population[row][col] = population[i]
-
-    # Store fitness values
-    for j in range(0, population_size):
-        out_fitnesses = fitness_values[j]
-    return
-
-
 def test(name, module):
-    reset()
+    init_population = np.random.rand(100, 30)
+    init_fitnesses = np.random.rand(100, 1)
+    out_population = np.zeros((100, 30), dtype='float32')
+    out_fitnesses = np.zeros((100, 1), dtype='float32')
+
+    def results_callback(population, fitness_values, population_size, problem_size):
+        # Store results to python memory containers
+
+        # Store population
+        for i in range(0, population_size * problem_size):
+            row = int(i / problem_size)
+            col = i % problem_size
+            out_population[row][col] = population[i]
+
+        # Store fitness values
+        for j in range(0, population_size):
+            out_fitnesses = fitness_values[j]
+        return
+
     result_01 = module.run(
         150000,
         100,
@@ -81,13 +79,13 @@ def test(name, module):
     )
 
     print(name + " (with provided population)")
-    print("Initial Population & Fitness")
 
     min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
 
     if VERBOSE_LOGGING:
+        print("Initial Population & Fitness", init_population, init_fitnesses)
         print("Resulting Population", out_population)
-        print("Resulting Fitnesses", out_fitnesses)
+    # print("Resulting Fitnesses", out_fitnesses)
     print("TestObjectiveFunction:", sphere_function(
         out_population[min_fit_idx], 30).value)
     print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
@@ -97,7 +95,28 @@ def test(name, module):
 # NOTE: This function has a different call signature
 def test_LSHADE():
     module = devo.LSHADE
-    reset()
+
+    population_size = 30 * 18
+    # Has different size input
+    init_population = np.random.rand(population_size, 30)
+    init_fitnesses = np.random.rand(population_size, 1)
+    out_population = np.zeros((population_size, 30), dtype='float32')
+    out_fitnesses = np.zeros((population_size, 1), dtype='float32')
+
+    def results_callback(population, fitness_values, population_size, problem_size):
+            # Store results to python memory containers
+        # Store population
+        for i in range(0, population_size * problem_size):
+            row = int(i / problem_size)
+            col = i % problem_size
+            out_population[row][col] = population[i]
+
+        # Store fitness values
+        for j in range(0, population_size):
+            f = fitness_values[j]
+            out_fitnesses = f
+        return
+
     result_01 = module.run(
         150000,
         sphere_function,
@@ -123,11 +142,11 @@ def test_LSHADE():
     )
 
     print("LSHADE (with provided population)")
-    print("Initial Population & Fitness")
 
     min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
 
     if VERBOSE_LOGGING:
+        print("Initial Population & Fitness", init_population, init_fitnesses)
         print("Resulting Population", out_population)
         print("Resulting Fitnesses", out_fitnesses)
     print("TestObjectiveFunction:", sphere_function(

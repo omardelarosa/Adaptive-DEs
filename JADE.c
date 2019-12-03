@@ -40,13 +40,6 @@ double run_JADE(const int max_function_evaluations, const int population_size,
     population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
   }
 
-  // initialization phase
-  if (initial_population != NULL && fitness_values != NULL) {
-    population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
-  } else {
-    population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
-  }
-
   int function_evaluation = 0;
 
   const int archive_size = (int)round(population_size * archive_rate);

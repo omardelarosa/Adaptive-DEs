@@ -43,6 +43,8 @@ _JADE.run_JADE.argtypes = (
     RESULTFUNC  # a callback to handle results
 )
 
+_JADE.run_JADE.restype = c.c_double
+
 
 def run(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
     result = _JADE.run_JADE(

@@ -19,7 +19,7 @@ _LSHADE = None
 try:
     _LSHADE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
 except IndexError:
-    raise OSError('missing static SHADE*.so library!')
+    raise OSError('missing static LSHADE*.so library!')
 
 
 # Objective function
@@ -39,6 +39,8 @@ _LSHADE.run_LSHADE.argtypes = (
     c.POINTER(c.c_double),  # fitness_values
     RESULTFUNC  # a callback to handle results
 )
+
+_LSHADE.run_LSHADE.restype = c.c_double
 
 
 def run(max_function_evaluations, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
