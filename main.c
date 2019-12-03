@@ -18,21 +18,20 @@ void do_something_with_results(const double * population_matrix, const double * 
 void run_all(unsigned int seed) {
 	srand(seed);
 	printf("rand seed: %d\n", seed);
-
+	// Initialization population
 	int population_size = 100;
 	int problem_size = 30;
-
-	printf("DE: %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0));
-
 	double *population = create_initial_population(population_size, problem_size);
 	double *fitness_values = create_initial_fitness_values(population_size);
-	printf("DE(with provided pop): %E\n", run_DE_with_population_provided(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
-
-	printf("jDE: %E\n", run_jDE(150000, 100, sphere_function, 30, -100.0, 100.0));
-	printf("CoDE: %E\n", run_CoDE(150000, 100, sphere_function, 30, -100.0, 100.0));
-	printf("JADE: %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0));
-	printf("SHADE: %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0));
-	printf("LSHADE: %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0));
+	printf("DE: %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, NULL, NULL, NULL));
+	printf("DE(with provided pop): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("jDE: %E\n", run_jDE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("jDE(with provided pop): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("CoDE: %E\n", run_CoDE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("JADE: %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("JADE(with provided pop): %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("SHADE: %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("LSHADE: %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
 }
 
 int main(void) {
@@ -72,5 +71,5 @@ double * create_initial_fitness_values(int population_size) {
 }
 
 void do_something_with_results(const double * population_matrix, const double * fitness_values, const int population_size, const int problem_size) {
-	printf("ran DE callback successfully: %d, %d\n", population_size, problem_size);
+	printf("ran result callback successfully: population_size: %d, problem_size: %d\n", population_size, problem_size);
 }

@@ -17,9 +17,17 @@ static DE_individual *run_selection(const DE_individual * const population, cons
 static int get_best_index(const DE_individual * const population, const int population_size);
 
 double run_DE(const int max_function_evaluations, const int population_size, const double scaling_factor, const double crossover_rate,
-	      const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound) {
+	      const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
+
+  DE_individual *population;
+
   // initialization phase
-  DE_individual *population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
+  if (initial_population != NULL && fitness_values != NULL) {
+    population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
+  } else {
+    population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
+  }
+
   int function_evaluation = 0;
   for (int i = 0; i < population_size; ++i) {
     population[i].fitness = objective_function(population[i].x, problem_size);
@@ -39,40 +47,8 @@ double run_DE(const int max_function_evaluations, const int population_size, con
     population = next_population;
   }
   const double best_fitness = population[get_best_index(population, population_size)].fitness;
-  terminate_population(population, population_size);
-  return best_fitness;
-}
 
-double run_DE_with_population_provided(
-    const int max_function_evaluations, const int population_size,
-    const double scaling_factor, const double crossover_rate,
-    const double (*objective_function)(const double *const, const int),
-    const int problem_size, const double lower_bound, const double upper_bound,
-    double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
-  // initialization phase
-  DE_individual *population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
-  // return 1.0;
-  int function_evaluation = 0;
-  for (int i = 0; i < population_size; ++i) {
-    population[i].fitness = objective_function(population[i].x, problem_size);
-    ++function_evaluation;
-  }
-  // iteration phase
-  while (max_function_evaluations > function_evaluation) {
-    DE_individual * const candidates = run_recombination(population, population_size, scaling_factor, crossover_rate, problem_size, lower_bound, upper_bound);
-    for (int i = 0; i < population_size; ++i) {
-      candidates[i].fitness = objective_function(candidates[i].x, problem_size);
-      ++function_evaluation;
-    }
-    DE_individual * const next_population = run_selection(population, candidates, population_size, problem_size);
-    terminate_population(population, population_size);
-    terminate_population(candidates, population_size);
-    population = next_population;
-  }
-
-  const double best_fitness = population[get_best_index(population, population_size)].fitness;
-
-  // Extract fitness values and final population
+    // Extract fitness values and final population
   if (results_callback != NULL) {
     double *population_matrix_results[population_size];
     double fitness_values_results[population_size];
@@ -87,7 +63,6 @@ double run_DE_with_population_provided(
     }
     results_callback(&population_matrix_results[0][0], (double*)&fitness_values_results, population_size, problem_size);
   }
-
 
   terminate_population(population, population_size);
   return best_fitness;

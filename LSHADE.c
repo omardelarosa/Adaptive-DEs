@@ -29,7 +29,7 @@ static LSHADE_selection_results run_selection(const LSHADE_individual * const po
 static int get_best_index(const LSHADE_individual * const population, const int population_size);
 
 double run_LSHADE(const int max_function_evaluations,
-		  const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound) {
+		  const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
   // initialization phase
   const int max_population_size = problem_size * 18;
   const int min_population_size = 4;

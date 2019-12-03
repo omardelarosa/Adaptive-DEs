@@ -67,7 +67,7 @@ def results_callback(population, fitness_values, population_size, problem_size):
         out_fitnesses = fitness_values[j]
     return
 
-DE.run_DE_with_population_provided(
+DE.run_DE(
     150000,
     100,
     0.5,

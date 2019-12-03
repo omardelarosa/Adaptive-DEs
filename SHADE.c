@@ -25,7 +25,7 @@ static SHADE_selection_results run_selection(const SHADE_individual * const popu
 static int get_best_index(const SHADE_individual * const population, const int population_size);
 
 double run_SHADE(const int max_function_evaluations, const int population_size,
-		 const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound) {
+		 const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
   // initialization phase
   SHADE_individual *population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
   int function_evaluation = 0;

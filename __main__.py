@@ -19,7 +19,10 @@ def run_all():
         sphere_function,
         30,
         -100.0,
-        100.0
+        100.0,
+        None,
+        None,
+        lambda x: x
     )
 
     print("DE: ", result_01)
@@ -43,7 +46,7 @@ def run_all():
             out_fitnesses = fitness_values[j]
         return
 
-    result_02 = devo.DE.run_DE_with_population_provided(
+    result_02 = devo.DE.run_DE(
         150000,
         100,
         0.5,
