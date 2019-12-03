@@ -44,7 +44,7 @@ _DE.run_DE.argtypes = (
 )
 
 
-def run(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
+def run_DE(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
     result = _DE.run_DE(
         c.c_int(max_function_evaluations),
         c.c_int(population_size),

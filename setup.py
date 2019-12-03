@@ -8,15 +8,25 @@ import subprocess
 with open('README.md') as README_file:
     README = README_file.read()
 
-# TODO: use cpython modules... Need to add more modules
-DE_module = Extension('DE',
-                      sources=['common.c', 'DE.c'],
-                      extra_compile_args=['-fPIC', '-shared'])
+# Index of all supported C modules
+C_MODULE_FILE_NAMES = [
+    ('DE', 'DE.c'),
+    ('LSHADE', 'LSHADE.c')
+]
+
+MODULES = []
+
+for PYTHON_MODULE_NAME, C_MODULE_FILE_NAME in C_MODULE_FILE_NAMES:
+    module = Extension(PYTHON_MODULE_NAME,
+                       sources=['common.c', C_MODULE_FILE_NAME],
+                       extra_compile_args=['-fPIC', '-shared'])
+    MODULES.append(module)
+
 
 setup(
     name='devo',  # temporary name
     version='0.1',
     description='Adaptive Differential Evolution',
     packages=['devo'],
-    ext_modules=[DE_module],
+    ext_modules=MODULES,
 )
