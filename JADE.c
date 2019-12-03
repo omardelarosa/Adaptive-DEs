@@ -9,6 +9,7 @@ static const double archive_rate = 1.0;
 
 static JADE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound);
 static JADE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initialized_population, double*fitness_values);
+static JADE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initialized_population, double*fitness_values);
 static JADE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound);
 static void terminate_population(JADE_individual * const population, const int population_size);
 static void terminate_individual(const JADE_individual individual);
@@ -30,7 +31,14 @@ static int get_best_index(const JADE_individual * const population, const int po
 double run_JADE(const int max_function_evaluations, const int population_size,
 		const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
   // initialization phase
-  JADE_individual *population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
+  JADE_individual *population;
+
+  // initialization phase
+  if (initial_population != NULL && fitness_values != NULL) {
+    population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
+  } else {
+    population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
+  }
 
   // initialization phase
   if (initial_population != NULL && fitness_values != NULL) {

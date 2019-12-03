@@ -92,7 +92,6 @@ static DE_individual *get_initialized_population_from_array(const int population
   return population;
 }
 
-
 static DE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound) {
   DE_individual individual;
   individual.x = (double *)malloc(sizeof(double) * problem_size);

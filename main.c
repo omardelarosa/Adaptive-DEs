@@ -24,14 +24,17 @@ void run_all(unsigned int seed) {
 	double *population = create_initial_population(population_size, problem_size);
 	double *fitness_values = create_initial_fitness_values(population_size);
 	printf("DE: %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, NULL, NULL, NULL));
-	printf("DE(with provided pop): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("DE(with provided population): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
 	printf("jDE: %E\n", run_jDE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	printf("jDE(with provided pop): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("jDE(with provided population): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
 	printf("CoDE: %E\n", run_CoDE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("CoDE(with provided population): %E\n", run_CoDE(150000, population_size, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
 	printf("JADE: %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	printf("JADE(with provided pop): %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("JADE(with provided population): %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
 	printf("SHADE: %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("SHADE(with provided population): %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
 	printf("LSHADE: %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("LSHADE(with provided population): %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
 }
 
 int main(void) {

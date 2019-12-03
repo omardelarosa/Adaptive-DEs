@@ -9,6 +9,7 @@ static const double archive_rate = 1.4;
 static const int memory_size = 5;
 
 static LSHADE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound);
+static LSHADE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initialized_population, double*fitness_values);
 static LSHADE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound);
 static void terminate_population(LSHADE_individual * const population, const int population_size);
 static void terminate_individual(const LSHADE_individual individual);
@@ -34,7 +35,13 @@ double run_LSHADE(const int max_function_evaluations,
   const int max_population_size = problem_size * 18;
   const int min_population_size = 4;
   int population_size = max_population_size;
-  LSHADE_individual *population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
+  LSHADE_individual *population;
+  if (initial_population != NULL && fitness_values != NULL) {
+    population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
+  } else {
+    population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
+  }
+
   int function_evaluation = 0;
   for (int i = 0; i < population_size; ++i) {
     population[i].fitness = objective_function(population[i].x, problem_size);
@@ -77,6 +84,23 @@ double run_LSHADE(const int max_function_evaluations,
     ++memory_pos;
   }
   const double best_fitness = population[get_best_index(population, population_size)].fitness;
+
+  // Extract fitness values and final population
+  if (results_callback != NULL) {
+    double *population_matrix_results[population_size];
+    double fitness_values_results[population_size];
+    for (int i = 0; i < population_size; i++)
+          population_matrix_results[i] = (double *)malloc(problem_size * sizeof(double));
+
+    for (int i = 0; i < population_size; i++) {
+      for (int j = 0; j < problem_size; j++) {
+        population_matrix_results[i][j] = population[i].x[j];
+      }
+      fitness_values_results[i] = population[i].fitness;
+    }
+    results_callback(&population_matrix_results[0][0], (double*)&fitness_values_results, population_size, problem_size);
+  }
+
   terminate_population(population, population_size);
   terminate_population(archive, archive_cnt);
   free(mu_scaling_factor);
@@ -88,6 +112,22 @@ static LSHADE_individual *get_initialized_population(const int population_size, 
   LSHADE_individual * const population = (LSHADE_individual *)malloc(sizeof(LSHADE_individual) * population_size);
   for (int i = 0; i < population_size; ++i) {
     population[i] = get_initialized_individual(problem_size, lower_bound, upper_bound);
+  }
+  return population;
+}
+
+static LSHADE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initial_population, double *fitness_values) {
+  // Creating population array pointer
+  LSHADE_individual * const population = (LSHADE_individual *)malloc(sizeof(LSHADE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i) {
+    static LSHADE_individual individual;
+    individual.x = (double *)malloc(problem_size * sizeof(double));
+    // Transfer values from 2D array to population array
+    for (int j = 0; j < problem_size; j++) {
+      individual.x[j] = *(initial_population + i * problem_size + j);
+    }
+    individual.fitness = (double)fitness_values[i];
+    population[i] = individual;
   }
   return population;
 }
