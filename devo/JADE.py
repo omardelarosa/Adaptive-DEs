@@ -32,8 +32,8 @@ RESULTFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double),
 _JADE.run_JADE.argtypes = (
     c.c_int,  # max_function_evaluations
     c.c_int,  # population_size
-    c.c_double,  # scaling_factor
-    c.c_double,  # crossover_rate
+    # c.c_double,  # scaling_factor
+    # c.c_double,  # crossover_rate
     OBJFUNC,  # objective_function
     c.c_int,  # problem_size
     c.c_double,  # lower_bound
@@ -47,11 +47,12 @@ _JADE.run_JADE.restype = c.c_double
 
 
 def run(max_function_evaluations, population_size, scaling_factor, crossover_rate, objective_function, problem_size, lower_bound, upper_bound, init_population, init_fitnesses, result_callback):
+    # NOTE: scaling factor is not used
     result = _JADE.run_JADE(
         c.c_int(max_function_evaluations),
         c.c_int(population_size),
-        c.c_double(scaling_factor),
-        c.c_double(crossover_rate),
+        # c.c_double(scaling_factor),
+        # c.c_double(crossover_rate),
         OBJFUNC(objective_function),
         problem_size,
         lower_bound,

@@ -23,7 +23,7 @@ MODULES = []
 for PYTHON_MODULE_NAME, C_MODULE_FILE_NAME in C_MODULE_FILE_NAMES:
     module = Extension(PYTHON_MODULE_NAME,
                        sources=['common.c', C_MODULE_FILE_NAME],
-                       extra_compile_args=['-fPIC', '-shared'])
+                       extra_compile_args=['-fPIC'])
     MODULES.append(module)
 
 
