@@ -22,8 +22,9 @@ def test(name, module, num_iterations, population_size):
 
     def sphere_function(vec, dimension):
         result = 0.0
-        for i in range(0, dimension):
-            result += (vec[i] * vec[i])
+        for i in range(dimension):
+            x = vec[i]
+            result += (x * x)
         return c.c_double(result)
 
     def results_callback(population, fitness_values, population_size, problem_size):
@@ -71,17 +72,19 @@ def test(name, module, num_iterations, population_size):
     )
 
     min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
+    min_individual = out_population[min_fit_idx]
     obj_result = sphere_function(
-        out_population[min_fit_idx], 30).value
+        min_individual, 30).value
 
-    print(name + " (with provided population): ", obj_result)
+    print(name + " (with provided population): ",
+          obj_result, "idx: ", min_fit_idx)
 
     if VERBOSE_LOGGING:
-        print("Initial Population & Fitness", init_population, init_fitnesses)
-        print("Resulting Population", out_population)
-        print("Resulting Fitnesses", out_fitnesses)
-        print("MinFitness: ", out_fitnesses[min_fit_idx], "Idx: ", min_fit_idx)
-        print("MinIndividual: ", out_population[min_fit_idx])
+        i = 0
+        for p in out_population:
+            print(i, ": expected:", out_fitnesses[i],
+                  " actual: ", sphere_function(p, 30).value, p)
+            i += 1
 
 
 def run_all():
