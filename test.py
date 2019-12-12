@@ -11,48 +11,61 @@ VERBOSE_LOGGING = True
 NUM_ITERATIONS = 150000
 
 
-def test(name, module, num_iterations, population_size):
-    init_population = np.random.rand(population_size, 30)
-    init_fitnesses = np.random.rand(population_size, 1)
-    out_population = np.zeros((population_size, 30), dtype='float32')
-    out_fitnesses = np.zeros((population_size, 1), dtype='float32')
+class Optimizer():
+    def __init__(self, population_size):
+        self.init_population = np.random.rand(population_size, 30)
+        self.init_fitnesses = np.random.rand(population_size, 1)
+        self.out_population = np.zeros((population_size, 30), dtype='float32')
+        self.out_fitnesses = np.zeros((population_size, 1), dtype='float32')
+        self.c = 0.0
+        return
 
-    def NULL_CALLBACK(x, y, z, w):
+    def update_result(self, result):
+        self.c = result
+        return
+
+    def NULL_CALLBACK(self, x, y, z, w):
         return None
 
-    def sphere_function(vec, dimension):
+    def sphere_function(self, vec, dimension):
         result = 0.0
         for i in range(dimension):
             x = vec[i]
             result += (x * x)
-        return c.c_double(result)
+        self.update_result(result)
+        return c.c_double(self.c)
 
-    def results_callback(population, fitness_values, population_size, problem_size):
+    def results_callback(self, population, fitness_values, population_size, problem_size):
         # Store results to python memory containers
         # Store population
         for i in range(0, population_size * problem_size):
             row = int(i / problem_size)
             col = i % problem_size
-            out_population[row][col] = population[i]
+            self.out_population[row][col] = population[i]
 
         # Store fitness values
         for j in range(0, population_size):
             f = fitness_values[j]
-            out_fitnesses[j] = f
+            self.out_fitnesses[j] = f
         return
+
+
+def test(name, module, num_iterations, population_size):
+
+    opt = Optimizer(population_size)
 
     result_01 = module.run(
         num_iterations,
         population_size,
         0.5,
         0.9,
-        sphere_function,
+        opt.sphere_function,
         30,
         -100.0,
         100.0,
         None,
         None,
-        NULL_CALLBACK
+        opt.NULL_CALLBACK
     )
 
     print((name + ": "), result_01)
@@ -62,18 +75,18 @@ def test(name, module, num_iterations, population_size):
         population_size,
         0.5,
         0.9,
-        sphere_function,
+        opt.sphere_function,
         30,
         -100.0,
         100.0,
-        init_population.ctypes.data_as(c.POINTER(c.c_double)),
-        init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
-        results_callback
+        opt.init_population.ctypes.data_as(c.POINTER(c.c_double)),
+        opt.init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
+        opt.results_callback
     )
 
-    min_fit_idx = out_fitnesses.tolist().index(out_fitnesses.min())
-    min_individual = out_population[min_fit_idx]
-    obj_result = sphere_function(
+    min_fit_idx = opt.out_fitnesses.tolist().index(opt.out_fitnesses.min())
+    min_individual = opt.out_population[min_fit_idx]
+    obj_result = opt.sphere_function(
         min_individual, 30).value
 
     print(name + " (with provided population): ",
@@ -81,11 +94,11 @@ def test(name, module, num_iterations, population_size):
 
     if VERBOSE_LOGGING:
         i = 0
-        for p in out_population:
-            if i >= len(out_fitnesses):
+        for p in opt.out_population:
+            if i >= len(opt.out_fitnesses):
                 break
-            print(i, ": expected:", out_fitnesses[i],
-                  " actual: ", sphere_function(p, 30).value, p)
+            print(i, ": expected:", opt.out_fitnesses[i],
+                  " actual: ", opt.sphere_function(p, 30).value, p)
             i += 1
 
 
@@ -93,8 +106,8 @@ def run_all():
     # test("DE", devo.DE, NUM_ITERATIONS, 100)
     # test("LSHADE", devo.LSHADE, NUM_ITERATIONS, 30 * 18)
     # test("SHADE", devo.SHADE, NUM_ITERATIONS, 100)
-    # test("jDE", devo.jDE, NUM_ITERATIONS, 100)
-    test("JADE", devo.JADE, NUM_ITERATIONS, 100)
+    test("jDE", devo.jDE, NUM_ITERATIONS, 100)
+    # test("JADE", devo.JADE, NUM_ITERATIONS, 100)
     # test("CoDE", devo.CoDE, NUM_ITERATIONS, 30)
 
 
