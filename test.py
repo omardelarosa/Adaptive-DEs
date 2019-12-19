@@ -6,34 +6,49 @@ import devo.jDE
 import devo.JADE
 import devo.CoDE
 import numpy as np
+from scipy.optimize import rosen
 
-VERBOSE_LOGGING = True
+VERBOSE_LOGGING = False
 NUM_ITERATIONS = 150000
+
+
+def sphere_function(vec, dimension):
+    result = 0.0
+    for i in range(dimension):
+        x = vec[i]
+        result += (x * x)
+    return c.c_double(result)
+
+
+def rosenbrock(vec, dimension):
+    np_vec = np.zeros((dimension,), dtype='float32')
+    for i in range(0, dimension):
+        np_vec[i] = vec[i]
+    res = rosen(np_vec)
+    return c.c_double(res)
 
 
 class Optimizer():
     def __init__(self, population_size):
-        self.init_population = np.random.rand(population_size, 30)
-        self.init_fitnesses = np.random.rand(population_size, 1)
-        self.out_population = np.zeros((population_size, 30), dtype='float32')
+        _min = -10.0  # min
+        _max = 10.0  # max
+        dimension = 30
+        self.init_population = (
+            _max - _min) * np.random.uniform(size=(population_size, dimension)) + _min
+        self.init_fitnesses = (_max - _min) * \
+            np.random.uniform(size=population_size) + _min
+        self.out_population = np.zeros(
+            (population_size, dimension), dtype='float32')
         self.out_fitnesses = np.zeros((population_size, 1), dtype='float32')
-        self.c = 0.0
+        self.cached = 0.0
         return
 
     def update_result(self, result):
-        self.c = result
+        self.cached = result
         return
 
     def NULL_CALLBACK(self, x, y, z, w):
         return None
-
-    def sphere_function(self, vec, dimension):
-        result = 0.0
-        for i in range(dimension):
-            x = vec[i]
-            result += (x * x)
-        self.update_result(result)
-        return c.c_double(self.c)
 
     def results_callback(self, population, fitness_values, population_size, problem_size):
         # Store results to python memory containers
@@ -50,16 +65,15 @@ class Optimizer():
         return
 
 
-def test(name, module, num_iterations, population_size):
-
+def test(name, module, num_iterations, population_size, obj_f):
     opt = Optimizer(population_size)
-
+    f = obj_f
     result_01 = module.run(
         num_iterations,
         population_size,
         0.5,
         0.9,
-        opt.sphere_function,
+        f,
         30,
         -100.0,
         100.0,
@@ -75,7 +89,7 @@ def test(name, module, num_iterations, population_size):
         population_size,
         0.5,
         0.9,
-        opt.sphere_function,
+        f,
         30,
         -100.0,
         100.0,
@@ -83,10 +97,10 @@ def test(name, module, num_iterations, population_size):
         opt.init_fitnesses.ctypes.data_as(c.POINTER(c.c_double)),
         opt.results_callback
     )
-
+    # print(opt.out_fitnesses)
     min_fit_idx = opt.out_fitnesses.tolist().index(opt.out_fitnesses.min())
     min_individual = opt.out_population[min_fit_idx]
-    obj_result = opt.sphere_function(
+    obj_result = f(
         min_individual, 30).value
 
     print(name + " (with provided population): ",
@@ -98,17 +112,25 @@ def test(name, module, num_iterations, population_size):
             if i >= len(opt.out_fitnesses):
                 break
             print(i, ": expected:", opt.out_fitnesses[i],
-                  " actual: ", opt.sphere_function(p, 30).value, p)
+                  " actual: ", f(p, 30).value)
             i += 1
 
 
 def run_all():
-    # test("DE", devo.DE, NUM_ITERATIONS, 100)
-    # test("LSHADE", devo.LSHADE, NUM_ITERATIONS, 30 * 18)
-    # test("SHADE", devo.SHADE, NUM_ITERATIONS, 100)
-    test("jDE", devo.jDE, NUM_ITERATIONS, 100)
-    # test("JADE", devo.JADE, NUM_ITERATIONS, 100)
-    # test("CoDE", devo.CoDE, NUM_ITERATIONS, 30)
+    population_size = 100
+    problem_size = 30
+    objective_functions = {
+        "Rosenbrock": rosenbrock,
+        "Sphere": sphere_function
+    }
+    for n, f in objective_functions.items():
+        print("----- Testing: ", n)
+        test("DE", devo.DE, NUM_ITERATIONS, population_size, f)
+        test("LSHADE", devo.LSHADE, NUM_ITERATIONS, problem_size * 18, f)
+        test("SHADE", devo.SHADE, NUM_ITERATIONS, population_size, f)
+        test("jDE", devo.jDE, NUM_ITERATIONS, population_size, f)
+        test("JADE", devo.JADE, NUM_ITERATIONS, population_size, f)
+        test("CoDE", devo.CoDE, NUM_ITERATIONS, problem_size, f)
 
 
 run_all()

@@ -18,8 +18,22 @@ static jDE_parameter_control_results parameter_control(const double scaling_fact
 static jDE_individual *run_selection(const jDE_individual * const population, const jDE_individual * const candidates, const int population_size, const int problem_size);
 static int get_best_index(const jDE_individual * const population, const int population_size);
 
-double run_jDE(const int max_function_evaluations, const int population_size,
-	       const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
+double run_jDE(
+        const int max_function_evaluations,
+        const int population_size,
+	      const double(*objective_function)(
+            const double * const,
+            const int),
+        const int problem_size,
+        const double lower_bound,
+        const double upper_bound,
+        double *initial_population,
+        double *fitness_values,
+        void (*results_callback)(
+            const double *population_results,
+            const double *fitness_results,
+            const int population_size,
+            const int problem_size)) {
   // initialization phase
   jDE_individual *population;
 
