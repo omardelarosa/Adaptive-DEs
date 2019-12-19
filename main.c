@@ -11,8 +11,8 @@
 
 // objective function
 const double sphere_function(const double * const vector, const int dimension);
-const double zakharov_func(double *x, int dimension);
-const double rosenbrock(double *x, int n);
+const double zakharov_func(const double * const vec, int dimension);
+const double rosenbrock(const double * const vec, int dimension);
 double *create_initial_population(int population_size, int problem_size);
 double *create_initial_fitness_values(int population_size);
 void do_something_with_results(const double * population_matrix, const double * fitness_values, const int population_size, const int problem_size);
@@ -25,18 +25,18 @@ void run_all(unsigned int seed) {
 	int problem_size = 30;
 	double *population = create_initial_population(population_size, problem_size);
 	double *fitness_values = create_initial_fitness_values(population_size);
-	printf("DE: %E\n", run_DE(2000000, population_size, 0.5, 0.9, rosenbrock, problem_size, -100.0, 100.0, NULL, NULL, NULL));
-	printf("DE(with provided population): %E\n", run_DE(2000000, population_size, 0.5, 0.9, rosenbrock, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
-	// printf("jDE: %E\n", run_jDE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	// printf("jDE(with provided population): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
-	// printf("CoDE: %E\n", run_CoDE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	// printf("CoDE(with provided population): %E\n", run_CoDE(150000, population_size, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
-	// printf("JADE: %E\n", run_JADE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	// printf("JADE(with provided population): %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
-	// printf("SHADE: %E\n", run_SHADE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	// printf("SHADE(with provided population): %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
-	// printf("LSHADE: %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
-	// printf("LSHADE(with provided population): %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("DE: %E\n", run_DE(2000000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, NULL, NULL, NULL));
+	printf("DE(with provided population): %E\n", run_DE(2000000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("jDE: %E\n", run_jDE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("jDE(with provided population): %E\n", run_DE(150000, population_size, 0.5, 0.9, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("CoDE: %E\n", run_CoDE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("CoDE(with provided population): %E\n", run_CoDE(150000, population_size, sphere_function, problem_size, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("JADE: %E\n", run_JADE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("JADE(with provided population): %E\n", run_JADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("SHADE: %E\n", run_SHADE(150000, population_size, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("SHADE(with provided population): %E\n", run_SHADE(150000, 100, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
+	printf("LSHADE: %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, NULL, NULL, NULL));
+	printf("LSHADE(with provided population): %E\n", run_LSHADE(150000, sphere_function, 30, -100.0, 100.0, population, fitness_values, do_something_with_results));
 }
 
 int main(void) {
@@ -44,12 +44,6 @@ int main(void) {
 	return 0;
 }
 
-const double sphere_function(const double * const vector, const int dimension) {
-	double result = 0.0;
-	for (int i = 0; i < dimension; ++i)
-		result += vector[i] * vector[i];
-	return result;
-}
 
 double *create_initial_population(int population_size, int problem_size) {
 	int m = population_size;
@@ -79,7 +73,16 @@ void do_something_with_results(const double * population_matrix, const double * 
 	printf("ran result callback successfully: population_size: %d, problem_size: %d\n", population_size, problem_size);
 }
 
-const double zakharov_func(double *x, int nx) /* zakharov */
+// Objective Functions:
+
+const double sphere_function(const double * const vector, const int dimension) {
+	double result = 0.0;
+	for (int i = 0; i < dimension; ++i)
+		result += vector[i] * vector[i];
+	return result;
+}
+
+const double const zakharov_func(const double * const x, int nx) /* zakharov */
 {
 	int i;
 	// sr_func (x, z, nx, Os, Mr,1.0, s_flag, r_flag); // shift and rotate
@@ -98,7 +101,7 @@ const double zakharov_func(double *x, int nx) /* zakharov */
 	return result;
 }
 
-const double rosenbrock(double *x, int n)
+const double rosenbrock(const double * const x, int n)
 {
 	double f, b = 0, c = 1;
 	for (int i = 0; i < n - 1; i++)
