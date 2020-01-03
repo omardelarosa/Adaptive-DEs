@@ -32,5 +32,6 @@ setup(
     version='0.1',
     description='Adaptive Differential Evolution',
     packages=['devo'],
+    package_dir={'devo': 'devo'},
     ext_modules=MODULES,
 )
