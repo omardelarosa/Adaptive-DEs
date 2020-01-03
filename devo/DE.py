@@ -13,7 +13,7 @@ _DE_SO_PATH = 'DE.*.so'
 # # the absolute path to the C shared object library
 _LIB_PATH = os.path.join(_MODULE_PATH, "..",
                          _BUILD_PATH, "**", _DE_SO_PATH)
-
+print("LIB_PATH", _LIB_PATH)
 _DE = None
 
 try:
