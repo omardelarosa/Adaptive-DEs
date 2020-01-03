@@ -26,7 +26,6 @@ for PYTHON_MODULE_NAME, C_MODULE_FILE_NAME in C_MODULE_FILE_NAMES:
                        extra_compile_args=['-fPIC'])
     MODULES.append(module)
 
-
 setup(
     name='devo',  # temporary name
     version='0.1',

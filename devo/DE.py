@@ -13,13 +13,19 @@ _DE_SO_PATH = 'DE.*.so'
 # # the absolute path to the C shared object library
 _LIB_PATH = os.path.join(_MODULE_PATH, "..",
                          _BUILD_PATH, "**", _DE_SO_PATH)
-print("LIB_PATH", _LIB_PATH)
+_LIB_PATH_ROOT = os.path.join(_MODULE_PATH, "..", _DE_SO_PATH)
+
 _DE = None
 
+# check build dir
 try:
     _DE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
 except IndexError:
-    raise OSError('missing static DE*.so library!')
+    # check root directory
+    try:
+        _DE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH_ROOT)[0])
+    except IndexError:
+        raise OSError('missing static DE*.so library!')
 
 
 # Objective function
