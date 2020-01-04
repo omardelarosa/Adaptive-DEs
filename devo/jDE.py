@@ -10,17 +10,24 @@ _BUILD_PATH = "build"
 
 # # DLL path
 _jDE_SO_PATH = 'jDE.*.so'
-# # the absolute path to the C shared object library
+# the absolute path to the C shared object library
 _LIB_PATH = os.path.join(_MODULE_PATH, "..",
                          _BUILD_PATH, "**", _jDE_SO_PATH)
 
+# package root dir
+_LIB_PATH_ROOT = os.path.join(_MODULE_PATH, "..", _jDE_SO_PATH)
+
 _jDE = None
 
+# check build dir
 try:
     _jDE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
 except IndexError:
-    raise OSError('missing static jDE*.so library!')
-
+    # check root directory
+    try:
+        _jDE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH_ROOT)[0])
+    except IndexError:
+        raise OSError('missing static jDE*.so library!')
 
 # Objective function
 OBJFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double), c.c_int)

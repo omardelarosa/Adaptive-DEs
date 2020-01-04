@@ -10,17 +10,24 @@ _BUILD_PATH = "build"
 
 # # DLL path
 _SHADE_SO_PATH = 'SHADE.*.so'
-# # the absolute path to the C shared object library
+# the absolute path to the C shared object library
 _LIB_PATH = os.path.join(_MODULE_PATH, "..",
                          _BUILD_PATH, "**", _SHADE_SO_PATH)
 
+# package root dir
+_LIB_PATH_ROOT = os.path.join(_MODULE_PATH, "..", _SHADE_SO_PATH)
+
 _SHADE = None
 
+# check build dir
 try:
     _SHADE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH)[0])
 except IndexError:
-    raise OSError('missing static SHADE*.so library!')
-
+    # check root directory
+    try:
+        _SHADE = c.cdll.LoadLibrary(glob.glob(_LIB_PATH_ROOT)[0])
+    except IndexError:
+        raise OSError('missing static SHADE*.so library!')
 
 # Objective function
 OBJFUNC = c.CFUNCTYPE(None, c.POINTER(c.c_double), c.c_int)
