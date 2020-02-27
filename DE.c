@@ -4,85 +4,102 @@
 #include "DE.h"
 
 static DE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound);
-static DE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initialized_population, double*fitness_values);
+static DE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initialized_population, double *fitness_values);
 static DE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound);
-static void terminate_population(DE_individual * const population, const int population_size);
+static void terminate_population(DE_individual *const population, const int population_size);
 static void terminate_individual(const DE_individual individual);
-static DE_individual *get_copied_population(const DE_individual * const source_population, const int population_size, const int problem_size);
+static DE_individual *get_copied_population(const DE_individual *const source_population, const int population_size, const int problem_size);
 static DE_individual get_copied_individual(const DE_individual source_individual, const int problem_size);
-static DE_individual *run_recombination(const DE_individual * const population, const int population_size, const double scaling_factor, const double crossover_rate,
-					const int problem_size, const double lower_bound, const double upper_bound);
-static DE_individual *run_selection(const DE_individual * const population, const DE_individual * const candidates, const int population_size, const int problem_size);
-static int get_best_index(const DE_individual * const population, const int population_size);
+static DE_individual *run_recombination(const DE_individual *const population, const int population_size, const double scaling_factor, const double crossover_rate,
+                                        const int problem_size, const double lower_bound, const double upper_bound);
+static DE_individual *run_selection(const DE_individual *const population, const DE_individual *const candidates, const int population_size, const int problem_size);
+static int get_best_index(const DE_individual *const population, const int population_size);
 
 double run_DE(const int max_function_evaluations, const int population_size, const double scaling_factor, const double crossover_rate,
-	      const double(*objective_function)(const double * const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size)) {
+              const double (*objective_function)(const double *const, const int), const int problem_size, const double lower_bound, const double upper_bound, double *initial_population, double *fitness_values, void (*results_callback)(const double *population_results, const double *fitness_results, const int population_size, const int problem_size))
+{
 
   DE_individual *population;
 
   // initialization phase
-  if (initial_population != NULL && fitness_values != NULL) {
+  if (initial_population != NULL && fitness_values != NULL)
+  {
     population = get_initialized_population_from_array(population_size, problem_size, initial_population, fitness_values);
-  } else {
+  }
+  else
+  {
     population = get_initialized_population(population_size, problem_size, lower_bound, upper_bound);
   }
 
   int function_evaluation = 0;
-  for (int i = 0; i < population_size; ++i) {
+  for (int i = 0; i < population_size; ++i)
+  {
     population[i].fitness = objective_function(population[i].x, problem_size);
     ++function_evaluation;
   }
   // iteration phase
-  while (max_function_evaluations > function_evaluation) {
-    DE_individual * const candidates = run_recombination(population, population_size, scaling_factor, crossover_rate, problem_size, lower_bound, upper_bound);
-    for (int i = 0; i < population_size; ++i) {
+  while (max_function_evaluations > function_evaluation)
+  {
+    DE_individual *const candidates = run_recombination(population, population_size, scaling_factor, crossover_rate, problem_size, lower_bound, upper_bound);
+    for (int i = 0; i < population_size; ++i)
+    {
       candidates[i].fitness = objective_function(candidates[i].x, problem_size);
       ++function_evaluation;
     }
 
-    DE_individual * const next_population = run_selection(population, candidates, population_size, problem_size);
+    DE_individual *const next_population = run_selection(population, candidates, population_size, problem_size);
     terminate_population(population, population_size);
     terminate_population(candidates, population_size);
     population = next_population;
   }
   const double best_fitness = population[get_best_index(population, population_size)].fitness;
 
-    // Extract fitness values and final population
-  if (results_callback != NULL) {
+  // Extract fitness values and final population
+  if (results_callback != NULL)
+  {
     double *population_matrix_results[population_size];
     double fitness_values_results[population_size];
     for (int i = 0; i < population_size; i++)
-          population_matrix_results[i] = (double *)malloc(problem_size * sizeof(double));
+      population_matrix_results[i] = (double *)malloc(problem_size * sizeof(double));
 
-    for (int i = 0; i < population_size; i++) {
-      for (int j = 0; j < problem_size; j++) {
+    for (int i = 0; i < population_size; i++)
+    {
+      for (int j = 0; j < problem_size; j++)
+      {
         population_matrix_results[i][j] = population[i].x[j];
       }
       fitness_values_results[i] = population[i].fitness;
     }
-    results_callback(&population_matrix_results[0][0], (double*)&fitness_values_results, population_size, problem_size);
+    results_callback(&population_matrix_results[0][0], (double *)&fitness_values_results, population_size, problem_size);
+    free(population_matrix_results);
+    free(fitness_values_results);
   }
 
   terminate_population(population, population_size);
   return best_fitness;
 }
 
-static DE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound) {
-  DE_individual * const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
-  for (int i = 0; i < population_size; ++i) {
+static DE_individual *get_initialized_population(const int population_size, const int problem_size, const double lower_bound, const double upper_bound)
+{
+  DE_individual *const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i)
+  {
     population[i] = get_initialized_individual(problem_size, lower_bound, upper_bound);
   }
   return population;
 }
 
-static DE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initial_population, double *fitness_values) {
+static DE_individual *get_initialized_population_from_array(const int population_size, const int problem_size, double *initial_population, double *fitness_values)
+{
   // Creating population array pointer
-  DE_individual * const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
-  for (int i = 0; i < population_size; ++i) {
+  DE_individual *const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i)
+  {
     static DE_individual individual;
     individual.x = (double *)malloc(problem_size * sizeof(double));
     // Transfer values from 2D array to population array
-    for (int j = 0; j < problem_size; j++) {
+    for (int j = 0; j < problem_size; j++)
+    {
       individual.x[j] = *(initial_population + i * problem_size + j);
     }
     individual.fitness = (double)fitness_values[i];
@@ -91,36 +108,44 @@ static DE_individual *get_initialized_population_from_array(const int population
   return population;
 }
 
-static DE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound) {
+static DE_individual get_initialized_individual(const int problem_size, const double lower_bound, const double upper_bound)
+{
   DE_individual individual;
   individual.x = (double *)malloc(sizeof(double) * problem_size);
-  for (int j = 0; j < problem_size; ++j) {
+  for (int j = 0; j < problem_size; ++j)
+  {
     individual.x[j] = lower_bound + (rand() / (double)RAND_MAX) * (upper_bound - lower_bound);
   }
   individual.fitness = 235711131719.0;
   return individual;
 }
 
-static void terminate_population(DE_individual * const population, const int population_size) {
-  for (int i = 0; i < population_size; ++i) {
+static void terminate_population(DE_individual *const population, const int population_size)
+{
+  for (int i = 0; i < population_size; ++i)
+  {
     terminate_individual(population[i]);
   }
   free(population);
 }
 
-static void terminate_individual(const DE_individual individual) {
+static void terminate_individual(const DE_individual individual)
+{
   free(individual.x);
 }
 
-static DE_individual *get_copied_population(const DE_individual * const source_population, const int population_size, const int problem_size) {
-  DE_individual * const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
-  for (int i = 0; i < population_size; ++i) {
+static DE_individual *get_copied_population(const DE_individual *const source_population, const int population_size, const int problem_size)
+{
+  DE_individual *const population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i)
+  {
     population[i] = get_copied_individual(source_population[i], problem_size);
   }
   return population;
 }
 
-static DE_individual get_copied_individual(const DE_individual source_individual, const int problem_size) {
+static DE_individual get_copied_individual(const DE_individual source_individual, const int problem_size)
+{
   DE_individual individual;
   individual.x = (double *)malloc(sizeof(double) * problem_size);
   memcpy(individual.x, source_individual.x, sizeof(double) * problem_size);
@@ -128,18 +153,23 @@ static DE_individual get_copied_individual(const DE_individual source_individual
   return individual;
 }
 
-static DE_individual *run_recombination(const DE_individual * const population, const int population_size, const double scaling_factor, const double crossover_rate,
-					const int problem_size, const double lower_bound, const double upper_bound) {
-  DE_individual * const candidates = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
-  for (int i = 0; i < population_size; ++i) {
+static DE_individual *run_recombination(const DE_individual *const population, const int population_size, const double scaling_factor, const double crossover_rate,
+                                        const int problem_size, const double lower_bound, const double upper_bound)
+{
+  DE_individual *const candidates = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i)
+  {
     int r1, r2, r3;
-    do {
+    do
+    {
       r1 = rand() % population_size;
     } while (r1 == i);
-    do {
+    do
+    {
       r2 = rand() % population_size;
     } while ((r2 == r1) || (r2 == i));
-    do {
+    do
+    {
       r3 = rand() % population_size;
     } while ((r3 == r2) || (r3 == r1) || (r3 == i));
     candidates[i].x = run_rand_1_bin(population[i].x, population[r1].x, population[r2].x, population[r3].x, scaling_factor, crossover_rate, problem_size, lower_bound, upper_bound);
@@ -147,23 +177,30 @@ static DE_individual *run_recombination(const DE_individual * const population, 
   return candidates;
 }
 
-static DE_individual *run_selection(const DE_individual * const population, const DE_individual * const candidates, const int population_size, const int problem_size) {
-  DE_individual * const next_population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
-  for (int i = 0; i < population_size; ++i) {
-    if (candidates[i].fitness <= population[i].fitness) {
+static DE_individual *run_selection(const DE_individual *const population, const DE_individual *const candidates, const int population_size, const int problem_size)
+{
+  DE_individual *const next_population = (DE_individual *)malloc(sizeof(DE_individual) * population_size);
+  for (int i = 0; i < population_size; ++i)
+  {
+    if (candidates[i].fitness <= population[i].fitness)
+    {
       next_population[i] = get_copied_individual(candidates[i], problem_size);
     }
-    else {
+    else
+    {
       next_population[i] = get_copied_individual(population[i], problem_size);
     }
   }
   return next_population;
 }
 
-static int get_best_index(const DE_individual * const population, const int population_size) {
+static int get_best_index(const DE_individual *const population, const int population_size)
+{
   int best_index = 0;
-  for (int i = 1; i < population_size; ++i) {
-    if (population[i].fitness < population[best_index].fitness) {
+  for (int i = 1; i < population_size; ++i)
+  {
+    if (population[i].fitness < population[best_index].fitness)
+    {
       best_index = i;
     }
   }
